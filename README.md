@@ -1,0 +1,1 @@
+# Rishika-Sub-Junior-Powerlifter
