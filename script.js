@@ -15,16 +15,38 @@ if (contactForm) {
         e.preventDefault();
         
         // Get form data
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
+        const formData = {
+            name: this.querySelector('input[name="name"]').value,
+            email: this.querySelector('input[name="email"]').value,
+            message: this.querySelector('textarea[name="message"]').value
+        };
         
-        // Here you would typically send the data to a server
-        // For now, we'll just log it and show a success message
-        console.log('Form submitted:', data);
+        // Show loading state
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitButton.disabled = true;
         
-        // Show success message
-        alert('Thank you for your message! We will get back to you soon.');
-        this.reset();
+        // Simulate form submission (replace with actual API call)
+        setTimeout(() => {
+            // Show success message
+            const successMessage = document.createElement('div');
+            successMessage.className = 'form-message success';
+            successMessage.innerHTML = '<i class="fas fa-check-circle"></i> Message sent successfully! I will get back to you soon.';
+            contactForm.appendChild(successMessage);
+            
+            // Reset form
+            contactForm.reset();
+            
+            // Reset button state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            // Remove success message after 5 seconds
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
+        }, 1500);
     });
 }
 
@@ -163,46 +185,40 @@ function openLightbox(src, type) {
     const lightboxImg = document.getElementById('lightbox-img');
     const lightboxVideo = document.getElementById('lightbox-video');
     
-    currentMediaIndex = mediaItems.findIndex(item => item.src === src);
-    
     if (type === 'image') {
+        lightboxImg.src = src;
         lightboxImg.style.display = 'block';
         lightboxVideo.style.display = 'none';
-        lightboxImg.src = src;
-    } else {
-        lightboxImg.style.display = 'none';
-        lightboxVideo.style.display = 'block';
+    } else if (type === 'video') {
         lightboxVideo.src = src;
-        lightboxVideo.load();
-        lightboxVideo.play();
+        lightboxVideo.style.display = 'block';
+        lightboxImg.style.display = 'none';
     }
     
-    lightbox.classList.add('active');
+    lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
     const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
     const lightboxVideo = document.getElementById('lightbox-video');
     
-    lightbox.classList.remove('active');
-    document.body.style.overflow = '';
+    lightbox.style.display = 'none';
+    lightboxImg.style.display = 'none';
+    lightboxVideo.style.display = 'none';
     lightboxVideo.pause();
-    lightboxVideo.currentTime = 0;
+    document.body.style.overflow = 'auto';
 }
 
-function prevItem(e) {
-    e.stopPropagation();
-    currentMediaIndex = (currentMediaIndex - 1 + mediaItems.length) % mediaItems.length;
-    const item = mediaItems[currentMediaIndex];
-    openLightbox(item.src, item.type);
+function prevItem(event) {
+    event.stopPropagation();
+    // Add navigation logic for images
 }
 
-function nextItem(e) {
-    e.stopPropagation();
-    currentMediaIndex = (currentMediaIndex + 1) % mediaItems.length;
-    const item = mediaItems[currentMediaIndex];
-    openLightbox(item.src, item.type);
+function nextItem(event) {
+    event.stopPropagation();
+    // Add navigation logic for images
 }
 
 // Close lightbox when clicking outside the content
@@ -231,24 +247,66 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Scroll Animations
-function reveal() {
-    const reveals = document.querySelectorAll('.reveal');
-    
-    for (let i = 0; i < reveals.length; i++) {
-        const windowHeight = window.innerHeight;
-        const elementTop = reveals[i].getBoundingClientRect().top;
-        const elementVisible = 150;
-        
-        if (elementTop < windowHeight - elementVisible) {
-            reveals[i].classList.add('active');
-        } else {
-            reveals[i].classList.remove('active');
+function revealOnScroll() {
+    const sections = document.querySelectorAll('section');
+    const windowHeight = window.innerHeight;
+    const revealPoint = 150;
+
+    sections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        if (sectionTop < windowHeight - revealPoint) {
+            section.classList.add('active');
         }
-    }
+    });
 }
 
-window.addEventListener('scroll', reveal);
-reveal(); // Initial check
+// Initialize animations
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial reveal check
+    revealOnScroll();
+
+    // Add scroll event listener
+    window.addEventListener('scroll', revealOnScroll);
+
+    // Add hover effects to gallery items
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    galleryItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            item.style.transform = 'scale(1.05)';
+            item.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+        });
+        item.addEventListener('mouseleave', () => {
+            item.style.transform = 'scale(1)';
+            item.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+        });
+    });
+
+    // Add hover effects to certificate cards
+    const certificateCards = document.querySelectorAll('.certificate-card');
+    certificateCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-10px)';
+            card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+        });
+    });
+
+    // Add hover effects to qualification cards
+    const qualificationCards = document.querySelectorAll('.qualification-card');
+    qualificationCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'scale(1.05)';
+            card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'scale(1)';
+            card.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+        });
+    });
+});
 
 // Contact Form Handling
 document.addEventListener('DOMContentLoaded', function() {
